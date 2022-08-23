@@ -59,12 +59,19 @@ public class SimpleMap<K, V> implements Map<K, V> {
     @Override
     public V get(K key) {
         V value = null;
-        MapEntry<K, V> el = table[getIndex(key)];
+        int i = key == null ? 0 : getIndex(key);
+        MapEntry<K, V> el = table[i];
         if (el != null) {
             if (key == null) {
-                value = el.value;
-            } else if (el.key.hashCode() == key.hashCode()
-                && el.key.equals(key)) {
+                if (el.key == null) {
+                    value = el.value;
+                } else {
+                    value = null;
+                }
+            } else if (el.key != null
+                    && el.key.hashCode() == key.hashCode()
+                    && el.key.equals(key)
+                    || (key == el.key)) {
                 value = el.value;
             }
         }
@@ -82,8 +89,9 @@ public class SimpleMap<K, V> implements Map<K, V> {
                 count--;
                 modCount++;
                 rsl = true;
-            } else if (el.key.hashCode() == key.hashCode()
-                && el.key.equals(key)) {
+            } else if (el.key != null
+                    && el.key.hashCode() == key.hashCode()
+                    && el.key.equals(key)) {
                 table[index] = null;
                 count--;
                 modCount++;
